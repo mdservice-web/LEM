@@ -22,16 +22,70 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Prepare Android project
+      - name: Create Android project
         run: |
           mkdir -p app/src/main/java/com/loanemimanager
           mkdir -p app/src/main/res/values
+
+          cat > settings.gradle.kts <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+
+          rootProject.name = "LoanEMIManager"
+          include(":app")
+          EOF
+
+          cat > build.gradle.kts <<'EOF'
+          plugins {
+              id("com.android.application") version "8.7.3" apply false
+              id("org.jetbrains.kotlin.android") version "2.0.21" apply false
+          }
+          EOF
+
+          cat > app/build.gradle.kts <<'EOF'
+          plugins {
+              id("com.android.application")
+              id("org.jetbrains.kotlin.android")
+          }
+
+          android {
+              namespace = "com.loanemimanager"
+              compileSdk = 35
+
+              defaultConfig {
+                  applicationId = "com.loanemimanager"
+                  minSdk = 23
+                  targetSdk = 35
+                  versionCode = 1
+                  versionName = "1.0"
+              }
+          }
+
+          dependencies {
+              implementation("androidx.core:core-ktx:1.15.0")
+              implementation("androidx.appcompat:appcompat:1.7.0")
+              implementation("com.google.android.material:material:1.12.0")
+              implementation("androidx.activity:activity-ktx:1.10.0")
+          }
+          EOF
 
           cp AndroidManifest.xml app/src/main/AndroidManifest.xml
           cp MainActivity.kt app/src/main/java/com/loanemimanager/MainActivity.kt
           cp strings.xml app/src/main/res/values/strings.xml
           cp styles.xml app/src/main/res/values/styles.xml
-          cp "build.gradle (1).kts" app/build.gradle.kts
 
       - name: Build APK
         run: gradle assembleDebug --no-daemon
