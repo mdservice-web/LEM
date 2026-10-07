@@ -8,27 +8,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
       - name: Prepare Android project
         run: |
           mkdir -p app/src/main/java/com/loanemimanager
           mkdir -p app/src/main/res/values
 
-          cp "AndroidManifest.xml" app/src/main/AndroidManifest.xml
-          cp "MainActivity.kt" app/src/main/java/com/loanemimanager/MainActivity.kt
-          cp "strings.xml" app/src/main/res/values/strings.xml
-          cp "styles.xml" app/src/main/res/values/styles.xml
+          cp AndroidManifest.xml app/src/main/AndroidManifest.xml
+          cp MainActivity.kt app/src/main/java/com/loanemimanager/MainActivity.kt
+          cp strings.xml app/src/main/res/values/strings.xml
+          cp styles.xml app/src/main/res/values/styles.xml
           cp "build.gradle (1).kts" app/build.gradle.kts
-
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
 
       - name: Build APK
         run: gradle assembleDebug --no-daemon
