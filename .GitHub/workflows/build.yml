@@ -48,12 +48,30 @@ jobs:
           include(":app")
           EOF
 
-          
-          cat > app/build.gradle.kts <<'EOF'
-          plugins {
-              id("com.android.application")
-              id("org.jetbrains.kotlin.android")
+          cat > build.gradle.kts <<'EOF'
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+
+              dependencies {
+                  classpath("com.android.tools.build:gradle:8.7.3")
+                  classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
+              }
           }
+
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
+
+          cat > app/build.gradle.kts <<'EOF'
+          apply(plugin = "com.android.application")
+          apply(plugin = "org.jetbrains.kotlin.android")
 
           android {
               namespace = "com.loanemimanager"
@@ -76,6 +94,7 @@ jobs:
           kotlin {
               jvmToolchain(17)
           }
+
           dependencies {
               implementation("androidx.core:core-ktx:1.15.0")
               implementation("androidx.appcompat:appcompat:1.7.0")
